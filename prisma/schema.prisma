@@ -1,0 +1,157 @@
+// SEP + Auth.js (Prisma adapter)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---- Auth.js (Prisma adapter) ----
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  scope             String?
+  id_token          String? @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  phone         String?
+  password      String?   @db.Text // hashed; for Credentials provider
+  suspended     Boolean   @default(false)
+  accounts      Account[]
+  sessions      Session[]
+  applications  Application[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---- SEP domain ----
+enum AppStatus {
+  SUBMITTED
+  PAID
+  COMPLETED
+}
+
+enum AdmissionStatus {
+  PENDING
+  OFFERED
+  ACCEPTED
+  DECLINED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum PaymentVerifiedBy {
+  SYSTEM
+  API_OVERRIDE
+}
+
+enum SessionStatus {
+  ACTIVE
+  INACTIVE
+  CONCLUDED
+}
+
+model ApplicationSession {
+  id               String        @id @default(cuid())
+  year             Int
+  openAt           DateTime      @map("open_at")
+  closeAt          DateTime      @map("close_at")
+  amount           Decimal       @db.Decimal(10, 2)
+  availableClasses String[]      @map("available_classes")
+  status           SessionStatus @default(ACTIVE) @map("status")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  applications Application[]
+
+  @@map("application_sessions")
+}
+
+model Application {
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
+  sessionId String    @map("session_id")
+  wardName   String    @map("ward_name")
+  wardDob    DateTime  @map("ward_dob") @db.Date
+  wardGender String    @map("ward_gender")
+  class      String    @map("class")
+  status     AppStatus @default(SUBMITTED)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session   ApplicationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  payments  Payment[]
+  admission Admission?
+
+  @@map("applications")
+}
+
+model Payment {
+  id            String           @id @default(cuid())
+  applicationId String          @map("application_id")
+  reference     String?
+  amount        Decimal          @db.Decimal(10, 2)
+  status        PaymentStatus    @default(PENDING)
+  verifiedBy    PaymentVerifiedBy? @map("verified_by")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Admission {
+  id            String          @id @default(cuid())
+  applicationId String         @unique @map("application_id")
+  class         String?        @map("class")
+  status        AdmissionStatus @default(PENDING)
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("admissions")
+}

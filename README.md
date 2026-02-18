@@ -1,5 +1,20 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## School Enrollment Platform (SEP)
+
+Parent portal (login, dashboard, wards, applications) + headless Admin API. See `.cursor/rules/sep-technical-design.mdc` for architecture.
+
+### Environment
+
+Copy `.env.example` to `.env` and set:
+
+- `DATABASE_URL` – PostgreSQL connection string
+- `ADMIN_API_KEY` – Secret for Admin API (`X-Admin-API-Key` header)
+- `AUTH_SECRET` – Auth.js secret (e.g. `openssl rand -base64 32`)
+- `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` – For Google OAuth (optional)
+
+Then run `npm run db:generate` and `npm run db:migrate` (or `db:push` for prototyping).
+
 ## Getting Started
 
 First, run the development server:
