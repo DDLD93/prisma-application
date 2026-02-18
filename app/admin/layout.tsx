@@ -13,7 +13,7 @@ export default function AdminLayout({
             <Link href="/admin" className="font-medium hover:underline">
               Dashboard
             </Link>
-            <Link href="/admin/docs" className="text-muted-foreground hover:text-foreground hover:underline">
+            <Link href="/api/admin/docs" className="text-muted-foreground hover:text-foreground hover:underline">
               API docs
             </Link>
           </nav>

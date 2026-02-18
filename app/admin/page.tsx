@@ -11,7 +11,7 @@ export default function AdminPage() {
         programmatic access.
       </p>
       <Button asChild>
-        <Link href="/admin/docs">Open API docs</Link>
+        <Link href="/api/admin/docs">Open API docs</Link>
       </Button>
     </div>
   );
