@@ -1,4 +1,4 @@
-export const admissionPaths = {
+export const admissionPaths = ({
   "/admissions": {
     get: {
       summary: "List admissions",
@@ -19,7 +19,7 @@ export const admissionPaths = {
             },
           },
         },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
     post: {
@@ -43,9 +43,9 @@ export const admissionPaths = {
             },
           },
         },
-        "400": { description: "Missing applicationId, application not found, or already has admission", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "404": { description: "Application not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "400": { description: "Missing applicationId, application not found, or already has admission", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "404": { description: "Application not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
   },
@@ -70,8 +70,8 @@ export const admissionPaths = {
             },
           },
         },
-        "400": { description: "Body must contain array 'admissions'", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "400": { description: "Body must contain array 'admissions'", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
   },
@@ -92,7 +92,7 @@ export const admissionPaths = {
             },
           },
         },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
   },
@@ -113,8 +113,8 @@ export const admissionPaths = {
             },
           },
         },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "404": { description: "Admission not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "404": { description: "Admission not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
     patch: {
@@ -140,9 +140,9 @@ export const admissionPaths = {
             },
           },
         },
-        "400": { description: "Invalid JSON", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "404": { description: "Admission not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "400": { description: "Invalid JSON", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "404": { description: "Admission not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
     delete: {
@@ -161,9 +161,9 @@ export const admissionPaths = {
             },
           },
         },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "404": { description: "Admission not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "404": { description: "Admission not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
   },
-};
+});

@@ -1,4 +1,4 @@
-export const applicationPaths = {
+export const applicationPaths = ({
   "/applications": {
     get: {
       summary: "List applications",
@@ -143,11 +143,11 @@ export const applicationPaths = {
             },
           },
         },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "403": { description: "No admission record for this application", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "404": { description: "Application not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "500": { description: "PDF generation failed", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "403": { description: "No admission record for this application", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "404": { description: "Application not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "500": { description: "PDF generation failed", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
   },
-};
+});

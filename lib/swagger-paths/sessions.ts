@@ -1,4 +1,4 @@
-export const sessionPaths = {
+export const sessionPaths = ({
   "/sessions": {
     get: {
       summary: "List application sessions",
@@ -83,10 +83,10 @@ export const sessionPaths = {
             },
           },
         },
-        "400": { description: "Invalid JSON", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
-        "404": { description: "Session not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+        "400": { description: "Invalid JSON", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "401": { description: "Invalid or missing X-Admin-API-Key", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+        "404": { description: "Session not found", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
       },
     },
   },
-};
+});
