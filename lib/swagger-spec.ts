@@ -1,3 +1,5 @@
+import { openApiPaths } from "./swagger-paths";
+
 export const openApiSpec = {
   openapi: "3.0.0",
   info: {
@@ -47,6 +49,18 @@ export const openApiSpec = {
             enum: ["ACTIVE", "INACTIVE", "CONCLUDED"],
             description: "Optional. Default: ACTIVE",
           },
+        },
+      },
+      UpdateSessionBody: {
+        type: "object",
+        description: "All fields optional for partial update.",
+        properties: {
+          year: { type: "integer" },
+          openAt: { type: "string", format: "date-time" },
+          closeAt: { type: "string", format: "date-time" },
+          amount: { type: "number" },
+          availableClasses: { type: "array", items: { type: "string" } },
+          status: { type: "string", enum: ["ACTIVE", "INACTIVE", "CONCLUDED"] },
         },
       },
       PaymentSummary: {
@@ -180,318 +194,113 @@ export const openApiSpec = {
           message: { type: "string" },
         },
       },
-    },
-  },
-  paths: {
-    "/sessions": {
-      get: {
-        summary: "List application sessions",
-        description: "Returns all application sessions ordered by year descending.",
-        tags: ["Sessions"],
-        responses: {
-          "200": {
-            description: "List of sessions",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "array",
-                  items: { $ref: "#/components/schemas/Session" },
-                },
-              },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
+      Admission: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          applicationId: { type: "string" },
+          class: { type: "string", nullable: true },
+          status: { type: "string", enum: ["PENDING", "OFFERED", "ACCEPTED", "DECLINED"] },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+          application: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              wardName: { type: "string" },
+              sessionId: { type: "string" },
+              sessionYear: { type: "integer" },
             },
           },
         },
       },
-      post: {
-        summary: "Create application session",
-        description: "Creates a new application session with opening and closing dates and fee.",
-        tags: ["Sessions"],
-        requestBody: {
-          content: {
-            "application/json": {
-              schema: { $ref: "#/components/schemas/CreateSessionBody" },
-            },
+      CreateAdmissionBody: {
+        type: "object",
+        required: ["applicationId"],
+        properties: {
+          applicationId: { type: "string" },
+          class: { type: "string", nullable: true, description: "Optional class placement" },
+          status: { type: "string", enum: ["PENDING", "OFFERED", "ACCEPTED", "DECLINED"], description: "Optional. Default: PENDING" },
+        },
+      },
+      UpdateAdmissionBody: {
+        type: "object",
+        properties: {
+          class: { type: "string", nullable: true },
+          status: { type: "string", enum: ["PENDING", "OFFERED", "ACCEPTED", "DECLINED"] },
+        },
+      },
+      BulkAdmissionsBody: {
+        type: "object",
+        required: ["admissions"],
+        properties: {
+          admissions: {
+            type: "array",
+            items: { $ref: "#/components/schemas/CreateAdmissionBody" },
+            description: "List of admissions to create. Skips applications that already have an admission.",
           },
         },
-        responses: {
-          "200": {
-            description: "Created session",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/Session" },
-              },
-            },
+        example: {
+          admissions: [
+            { applicationId: "clx...", class: "Primary 1", status: "OFFERED" },
+            { applicationId: "cly...", status: "PENDING" },
+          ],
+        },
+      },
+      BulkAdmissionsResponse: {
+        type: "object",
+        properties: {
+          created: {
+            type: "array",
+            items: { type: "object", properties: { id: { type: "string" }, applicationId: { type: "string" } } },
           },
-          "400": {
-            description: "Missing year, openAt, closeAt, or amount; or invalid JSON",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
+          errors: {
+            type: "array",
+            nullable: true,
+            items: { type: "object", properties: { applicationId: { type: "string" }, error: { type: "string" } } },
           },
         },
       },
-    },
-    "/applications": {
-      get: {
-        summary: "List applications",
-        description: "Returns applications with optional filters by status and session.",
-        tags: ["Applications"],
-        parameters: [
-          {
-            name: "status",
-            in: "query",
-            schema: { type: "string", enum: ["SUBMITTED", "PAID", "COMPLETED"] },
-            description: "Filter by application status",
-          },
-          {
-            name: "sessionId",
-            in: "query",
-            schema: { type: "string" },
-            description: "Filter by session ID",
-          },
-        ],
-        responses: {
-          "200": {
-            description: "List of applications with session and payments",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "array",
-                  items: { $ref: "#/components/schemas/Application" },
-                },
+      PaginatedAdmissions: {
+        type: "object",
+        properties: {
+          data: { type: "array", items: { $ref: "#/components/schemas/Admission" } },
+          total: { type: "integer" },
+          page: { type: "integer" },
+          limit: { type: "integer" },
+        },
+      },
+      AdmissionResource: {
+        type: "object",
+        description: "Aggregate admission counts. When sessionId is omitted, includes bySession; when provided, counts are for that session only.",
+        properties: {
+          total: { type: "integer" },
+          byStatus: { type: "object", additionalProperties: { type: "integer" } },
+          byClass: { type: "object", additionalProperties: { type: "integer" } },
+          bySession: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                sessionId: { type: "string" },
+                year: { type: "integer" },
+                count: { type: "integer" },
               },
             },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
+            description: "Present only when sessionId query param is not set (overall stats).",
           },
         },
       },
-    },
-    "/applications/export": {
-      get: {
-        summary: "Export applications as CSV",
-        description: "Downloads all applications as a CSV file. Columns: id, wardName, wardDob, wardGender, class, sessionYear, status, createdAt.",
-        tags: ["Applications"],
-        responses: {
-          "200": {
-            description: "CSV file",
-            content: {
-              "text/csv": {
-                schema: { type: "string", format: "binary" },
-              },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-        },
-      },
-    },
-    "/applications/{id}": {
-      get: {
-        summary: "Get application by ID",
-        description: "Returns a single application with session, payments, and admission (if any).",
-        tags: ["Applications"],
-        parameters: [
-          { name: "id", in: "path", required: true, schema: { type: "string" } },
-        ],
-        responses: {
-          "200": {
-            description: "Application details",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/ApplicationWithAdmission" },
-              },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-          "404": {
-            description: "Application not found",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-        },
-      },
-    },
-    "/applications/{id}/form": {
-      get: {
-        summary: "Get application form PDF",
-        description: "Returns the application form as a PDF file for download.",
-        tags: ["Applications"],
-        parameters: [
-          { name: "id", in: "path", required: true, schema: { type: "string" } },
-        ],
-        responses: {
-          "200": {
-            description: "PDF file",
-            content: {
-              "application/pdf": {
-                schema: { type: "string", format: "binary" },
-              },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-          "404": {
-            description: "Application not found",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-          "500": {
-            description: "PDF generation failed",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-        },
-      },
-    },
-    "/payments": {
-      get: {
-        summary: "List payments",
-        description: "Returns all payments with application and session info, ordered by creation date descending.",
-        tags: ["Payments"],
-        responses: {
-          "200": {
-            description: "List of payments",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "array",
-                  items: { $ref: "#/components/schemas/Payment" },
-                },
-              },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-        },
-      },
-    },
-    "/payments/{id}/verify": {
-      patch: {
-        summary: "Verify payment",
-        description: "Marks the payment as completed and updates the related application status to PAID.",
-        tags: ["Payments"],
-        parameters: [
-          { name: "id", in: "path", required: true, schema: { type: "string" } },
-        ],
-        requestBody: {
-          content: {
-            "application/json": {
-              schema: { $ref: "#/components/schemas/VerifyPaymentBody" },
-            },
-          },
-        },
-        responses: {
-          "200": {
-            description: "Payment verified",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/VerifyPaymentResponse" },
-              },
-            },
-          },
-          "400": {
-            description: "Invalid verifiedBy or invalid JSON",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-          "404": {
-            description: "Payment not found",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-        },
-      },
-    },
-    "/analytics/enrollment": {
-      get: {
-        summary: "Enrollment analytics",
-        description: "Returns age buckets, gender distribution, and conversion (submitted/paid) metrics.",
-        tags: ["Analytics"],
-        responses: {
-          "200": {
-            description: "Enrollment analytics",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/EnrollmentAnalytics" },
-              },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
-        },
-      },
-    },
-    "/analytics/financial": {
-      get: {
-        summary: "Financial analytics",
-        description: "Returns per-session totals and breakdown by verifiedBy (SYSTEM vs API_OVERRIDE).",
-        tags: ["Analytics"],
-        responses: {
-          "200": {
-            description: "Financial analytics",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/FinancialAnalytics" },
-              },
-            },
-          },
-          "401": {
-            description: "Invalid or missing X-Admin-API-Key",
-            content: {
-              "application/json": { schema: { $ref: "#/components/schemas/Error" } },
-            },
-          },
+      PaginatedApplications: {
+        type: "object",
+        properties: {
+          data: { type: "array", items: { $ref: "#/components/schemas/Application" } },
+          total: { type: "integer" },
+          page: { type: "integer" },
+          limit: { type: "integer" },
         },
       },
     },
   },
+  paths: openApiPaths,
 };
