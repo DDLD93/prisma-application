@@ -7,19 +7,19 @@ export default function AdminLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b">
-        <div className="container flex h-14 items-center justify-between px-4">
-          <nav className="flex items-center gap-4">
-            <Link href="/admin" className="font-medium hover:underline">
+      <header className="border-b border-border/70 bg-card/80 backdrop-blur">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
+          <nav className="flex items-center gap-4 text-sm">
+            <Link href="/admin" className="font-medium hover:text-primary">
               Dashboard
             </Link>
-            <Link href="/api/admin/docs" className="text-muted-foreground hover:text-foreground hover:underline">
+            <Link href="/api/admin/docs" className="text-muted-foreground hover:text-foreground">
               API docs
             </Link>
           </nav>
         </div>
       </header>
-      <main className="flex-1 container p-4">{children}</main>
+      <main className="mx-auto flex-1 w-full max-w-6xl p-4">{children}</main>
     </div>
   );
 }

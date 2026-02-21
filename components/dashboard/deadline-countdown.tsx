@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 type DeadlineCountdownProps = {
   closeAt: string; // ISO date string
+  compact?: boolean;
 };
 
 function getTimeLeft(closeAt: Date): { days: number; hours: number; minutes: number; closed: boolean } {
@@ -19,7 +20,7 @@ function getTimeLeft(closeAt: Date): { days: number; hours: number; minutes: num
   return { days, hours, minutes, closed: false };
 }
 
-export function DeadlineCountdown({ closeAt }: DeadlineCountdownProps) {
+export function DeadlineCountdown({ closeAt, compact = false }: DeadlineCountdownProps) {
   const [left, setLeft] = useState(() => getTimeLeft(new Date(closeAt)));
 
   useEffect(() => {
@@ -31,19 +32,49 @@ export function DeadlineCountdown({ closeAt }: DeadlineCountdownProps) {
 
   if (left.closed) {
     return (
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         Applications for this session have closed.
       </p>
     );
   }
 
+  if (compact) {
+    return (
+      <p className="text-sm">
+        <span className="font-medium">Deadline in:</span>{" "}
+        <span className="text-muted-foreground">
+          {left.days}d {left.hours}h {left.minutes}m
+        </span>
+      </p>
+    );
+  }
+
+  const urgencyClass =
+    left.days <= 2
+      ? "border-destructive/40 bg-destructive/10"
+      : left.days <= 7
+      ? "border-accent/40 bg-accent/20"
+      : "border-primary/30 bg-primary/10";
+
   return (
-    <p className="text-sm">
-      <span className="font-medium">Application deadline:</span>{" "}
-      <span className="text-muted-foreground">
-        {left.days} day{left.days !== 1 ? "s" : ""}, {left.hours} hour
-        {left.hours !== 1 ? "s" : ""}, {left.minutes} min left
-      </span>
-    </p>
+    <div className="space-y-3">
+      <p className="text-sm font-medium text-muted-foreground">
+        Application deadline
+      </p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className={`rounded-xl border p-4 ${urgencyClass}`}>
+          <p className="text-3xl font-semibold">{left.days}</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Days</p>
+        </div>
+        <div className={`rounded-xl border p-4 ${urgencyClass}`}>
+          <p className="text-3xl font-semibold">{left.hours}</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Hours</p>
+        </div>
+        <div className={`rounded-xl border p-4 ${urgencyClass}`}>
+          <p className="text-3xl font-semibold">{left.minutes}</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Minutes</p>
+        </div>
+      </div>
+    </div>
   );
 }

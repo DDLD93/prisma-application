@@ -94,92 +94,116 @@ export function NewApplicationForm({
 
   return (
     <>
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="sessionId">Session</Label>
-        <select
-          id="sessionId"
-          name="sessionId"
-          required
-          value={selectedSessionId}
-          onChange={(e) => setSelectedSessionId(e.target.value)}
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
-          <option value="">Select session</option>
-          {sessions.map((s) => (
-            <option key={s.id} value={s.id}>
-              Year {s.year} (amount: {s.amount})
-            </option>
-          ))}
-        </select>
-      </div>
-      {selectedSessionId && (
+      <form onSubmit={onSubmit} className="space-y-5 rounded-2xl border border-border bg-card p-5 shadow-sm">
         <div className="space-y-2">
-          <Label htmlFor="class">Class</Label>
-          {classOptions.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No classes configured for this session.
-            </p>
-          ) : (
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+            Step 1 of 3
+          </p>
+          <div className="h-2 rounded-full bg-muted">
+            <div
+              className={`h-2 rounded-full bg-primary transition-all ${
+                selectedSessionId ? "w-2/3" : "w-1/3"
+              }`}
+            />
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-background/80 p-4">
+          <h3 className="mb-3 text-sm font-medium">Session details</h3>
+          <div className="space-y-2">
+            <Label htmlFor="sessionId">Session</Label>
             <select
-              id="class"
-              name="class"
+              id="sessionId"
+              name="sessionId"
               required
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              value={selectedSessionId}
+              onChange={(e) => setSelectedSessionId(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
-              <option value="">Select class</option>
-              {classOptions.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+              <option value="">Select session</option>
+              {sessions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  Year {s.year} (amount: {s.amount})
                 </option>
               ))}
             </select>
-          )}
+          </div>
         </div>
-      )}
-      <div className="space-y-2">
-        <Label htmlFor="wardName">Child name</Label>
-        <Input
-          id="wardName"
-          name="wardName"
-          type="text"
-          required
-          placeholder="Full name"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="wardDob">Date of birth</Label>
-        <Input
-          id="wardDob"
-          name="wardDob"
-          type="date"
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="wardGender">Gender</Label>
-        <select
-          id="wardGender"
-          name="wardGender"
-          required
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
-          <option value="">Select</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <div className="flex gap-2">
-        <Button type="submit" disabled={loading}>
-          {loading ? "Submitting…" : "Submit application"}
-        </Button>
-        <Button type="button" variant="outline" asChild>
-          <Link href="/">Cancel</Link>
-        </Button>
-      </div>
-    </form>
+
+        {selectedSessionId && (
+          <div className="rounded-xl border border-border bg-background/80 p-4">
+            <h3 className="mb-3 text-sm font-medium">Class selection</h3>
+            <div className="space-y-2">
+              <Label htmlFor="class">Class</Label>
+              {classOptions.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No classes configured for this session.
+                </p>
+              ) : (
+                <select
+                  id="class"
+                  name="class"
+                  required
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="">Select class</option>
+                  {classOptions.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="rounded-xl border border-border bg-background/80 p-4">
+          <h3 className="mb-3 text-sm font-medium">Child information</h3>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="wardName">Child name</Label>
+              <Input
+                id="wardName"
+                name="wardName"
+                type="text"
+                required
+                placeholder="Full name"
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="wardDob">Date of birth</Label>
+                <Input id="wardDob" name="wardDob" type="date" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="wardGender">Gender</Label>
+                <select
+                  id="wardGender"
+                  name="wardGender"
+                  required
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="">Select</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {error && <p className="text-sm text-destructive">{error}</p>}
+        <div className="flex gap-2">
+          <Button type="submit" disabled={loading}>
+            {loading ? "Submitting…" : "Submit application"}
+          </Button>
+          <Button type="button" variant="outline" asChild>
+            <Link href="/">Cancel</Link>
+          </Button>
+        </div>
+      </form>
 
     <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
       <DialogContent showCloseButton>

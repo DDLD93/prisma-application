@@ -32,11 +32,13 @@ export function LoadingFallback({
     <div
       className={
         className ??
-        "flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-4"
+        "relative flex min-h-screen flex-col items-center justify-center gap-4 overflow-hidden bg-background p-4"
       }
       role="status"
       aria-label="Loading"
     >
+      <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-primary/15 blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-10 -right-10 h-44 w-44 rounded-full bg-accent/20 blur-2xl" />
       <div
         className="size-8 animate-spin rounded-full border-2 border-muted border-t-primary"
         aria-hidden

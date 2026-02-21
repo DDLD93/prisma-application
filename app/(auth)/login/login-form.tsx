@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signInCredentials } from "@/actions/auth";
@@ -39,20 +39,16 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const initialUrlCode = searchParams.get("code");
+  const initialUrlError = searchParams.get("error");
+  const initialUrlDescription = searchParams.get("errorDescription");
+  const initialError = initialUrlCode
+    ? getAuthErrorMessage(initialUrlCode)
+    : initialUrlError
+    ? initialUrlDescription ?? getAuthErrorMessage(initialUrlError)
+    : null;
+  const [errorMessage, setErrorMessage] = useState<string | null>(initialError);
   const [loading, setLoading] = useState(false);
-
-  // Open error dialog when landing with ?error=... or ?code=...
-  useEffect(() => {
-    const urlCode = searchParams.get("code");
-    const urlError = searchParams.get("error");
-    const urlDescription = searchParams.get("errorDescription");
-    if (urlCode) {
-      setErrorMessage(getAuthErrorMessage(urlCode));
-    } else if (urlError) {
-      setErrorMessage(urlDescription ?? getAuthErrorMessage(urlError));
-    }
-  }, [searchParams]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -74,7 +70,7 @@ export function LoginForm() {
 
   return (
     <div className="space-y-4">
-      <form onSubmit={onSubmit} className="space-y-3">
+      <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -100,10 +96,17 @@ export function LoginForm() {
           {loading ? "Signing in…" : "Sign in"}
         </Button>
       </form>
+      <div className="flex items-center gap-2">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+          or
+        </span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
       <Button
         type="button"
         variant="outline"
-        className="w-full"
+        className="w-full bg-background"
         disabled={loading}
         onClick={() => signIn("google", { callbackUrl })}
       >

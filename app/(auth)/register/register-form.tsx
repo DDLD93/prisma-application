@@ -25,7 +25,7 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
+    <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
         <Input
@@ -59,7 +59,7 @@ export function RegisterForm() {
         />
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" className="w-full shadow-sm" disabled={loading}>
         {loading ? "Creating account…" : "Register"}
       </Button>
     </form>
